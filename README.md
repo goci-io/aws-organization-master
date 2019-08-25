@@ -9,7 +9,7 @@ Additionally this module allows you to pass in role, user or group names to gran
 
 | Name | Description | Default |
 |-------------------------------|------------------------------------------------------------------------------------------------|-------------------------------|
-| stages | `List of stages which represent member accounts. Object of `name`, `email` and `billing_access | - |
+| stages | List of stages which represent member accounts. Object of `name`, `email` and `billing_access` | - |
 | organization_access_role_name | Name of the role automatically created in the member accounts by AWS | OrganizationAccountAccessRole |
 | namespace | The company or organization prefix (eg: goci) | - |
 | allow_assume_for_groups | List of group names in the master account, allowed to assume the member role | `[]` |
@@ -17,3 +17,5 @@ Additionally this module allows you to pass in role, user or group names to gran
 | allow_assume_for_roles | List of role names in the master account, allowed to assume the member role | `[]` |
 
 Look into the [terraform.tfvars](terraform.tfvars.example) example.
+
+Please note hints about AWS organizations and how to delete them properly from [Terraform documentation](https://www.terraform.io/docs/providers/aws/r/organizations_account.html)
