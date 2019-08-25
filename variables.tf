@@ -36,3 +36,9 @@ variable "allow_assume_for_roles" {
   default     = []
   description = "Role names which will be allowed to assume the organization access role"
 }
+
+variable "only_with_mfa" {
+  type = bool
+  default = false
+  description = "Enforces MFA for users, groups and roles. If false roles will be able to assume without MFA enabled"
+}

@@ -9,6 +9,7 @@ provider "aws" {
 
 locals {
   attachment_required = length(var.allow_assume_for_users) > 0 || length(var.allow_assume_for_roles) > 0  || length(var.allow_assume_for_groups) > 0 
+  attach_to_humans    = length(var.allow_assume_for_users) > 0 || length(var.allow_assume_for_groups) > 0 || var.only_with_mfa
 }
 
 resource "aws_organizations_organization" "default" {
@@ -37,12 +38,28 @@ resource "null_resource" "role" {
 }
 
 data "aws_iam_policy_document" "assume" {
-  count = local.attachment_required ? 1 : 0
+  count = local.attachment_required && !var.only_with_mfa ? 1 : 0
 
   statement {
     effect    = "Allow"
     actions   = ["sts:AssumeRole"]
     resources = null_resource.role.*.triggers.role
+  }
+}
+
+data "aws_iam_policy_document" "assume_with_mfa" {
+  count = local.attach_to_humans ? 1 : 0
+
+  statement {
+    effect    = "Allow"
+    actions   = ["sts:AssumeRole"]
+    resources = null_resource.role.*.triggers.role
+
+    condition {
+      test     = "Bool"
+      variable = "aws:MultiFactorAuthPresent"
+      values   = ["true"]
+    }
   }
 }
 
@@ -54,11 +71,18 @@ resource "aws_iam_policy" "assume_organization_role" {
   path        = "/"
 }
 
-resource "aws_iam_policy_attachment" "attach" {
-  count      = local.attachment_required ? 1 : 0
+resource "aws_iam_policy_attachment" "services" {
+  count      = local.attachment_required && !var.only_with_mfa ? 1 : 0
   name       = format("%s-assume-organization-role", var.namespace)
-  users      = var.allow_assume_for_users
   roles      = var.allow_assume_for_roles
+  policy_arn = element(aws_iam_policy.assume_organization_role.*.arn, 0)
+}
+
+resource "aws_iam_policy_attachment" "humans" {
+  count      = local.attach_to_humans ? 1 : 0
+  name       = format("%s-assume-organization-role-with-mfa", var.namespace)
+  roles      = var.only_with_mfa ? var.allow_assume_for_roles : []
+  users      = var.allow_assume_for_users
   groups     = var.allow_assume_for_groups
   policy_arn = element(aws_iam_policy.assume_organization_role.*.arn, 0)
 }

@@ -7,6 +7,8 @@ Additionally this module allows you to pass in role, user or group names to gran
 
 ## Configuration
 
+Please note hints about AWS organizations and how to delete them properly from [Terraform documentation](https://www.terraform.io/docs/providers/aws/r/organizations_account.html)
+
 | Name | Description | Default |
 |-------------------------------|------------------------------------------------------------------------------------------------|-------------------------------|
 | stages | List of stages which represent member accounts. Object of `name`, `email` and `billing_access` | - |
@@ -15,7 +17,6 @@ Additionally this module allows you to pass in role, user or group names to gran
 | allow_assume_for_groups | List of group names in the master account, allowed to assume the member role | `[]` |
 | allow_assume_for_users | List of usernames in the master account, allowed to assume the member role | `[]` |
 | allow_assume_for_roles | List of role names in the master account, allowed to assume the member role | `[]` |
+| only_with_mfa | Enforces MFA for users, groups and roles. If false roles will be able to assume without MFA enabled | false |
 
 Look into the [terraform.tfvars](terraform.tfvars.example) example.
-
-Please note hints about AWS organizations and how to delete them properly from [Terraform documentation](https://www.terraform.io/docs/providers/aws/r/organizations_account.html)
