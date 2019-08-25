@@ -38,7 +38,13 @@ variable "allow_assume_for_roles" {
 }
 
 variable "only_with_mfa" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "Enforces MFA for users, groups and roles. If false roles will be able to assume without MFA enabled"
+}
+
+variable "disable_mfa" {
+  type        = bool
+  default     = false
+  description = "Disables MFA for users, groups. Cannot be used in combination with only_with_mfa"
 }

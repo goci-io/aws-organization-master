@@ -18,5 +18,6 @@ Please note hints about AWS organizations and how to delete them properly from [
 | allow_assume_for_users | List of usernames in the master account, allowed to assume the member role | `[]` |
 | allow_assume_for_roles | List of role names in the master account, allowed to assume the member role | `[]` |
 | only_with_mfa | Enforces MFA for users, groups and roles. If false roles will be able to assume without MFA enabled | false |
+| disable_mfa | Disables MFA for users, groups. Cannot be used in combination with only_with_mfa. We suggest to not disbale MFA for humans | false |
 
 Look into the [terraform.tfvars](terraform.tfvars.example) example.

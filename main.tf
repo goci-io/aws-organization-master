@@ -8,8 +8,8 @@ provider "aws" {
 }
 
 locals {
-  attachment_required = length(var.allow_assume_for_users) > 0 || length(var.allow_assume_for_roles) > 0  || length(var.allow_assume_for_groups) > 0 
-  attach_to_humans    = length(var.allow_assume_for_users) > 0 || length(var.allow_assume_for_groups) > 0 || var.only_with_mfa
+  attachment_required = length(var.allow_assume_for_users) > 0 || length(var.allow_assume_for_roles) > 0 || length(var.allow_assume_for_groups) > 0
+  attach_to_humans    = (length(var.allow_assume_for_users) > 0 || length(var.allow_assume_for_groups) > 0 || var.only_with_mfa) && !var.disable_mfa
 }
 
 resource "aws_organizations_organization" "default" {
@@ -23,7 +23,7 @@ resource "aws_organizations_account" "default" {
   email                      = lookup(var.stages[count.index], "email")
   iam_user_access_to_billing = lookup(var.stages[count.index], "billing_access", false) ? "ALLOW" : "DENY"
   role_name                  = var.organization_access_role_name
-  tags                       = {
+  tags = {
     Namespace = var.namespace
     Stage     = lookup(var.stages[count.index], "name")
   }
@@ -32,7 +32,7 @@ resource "aws_organizations_account" "default" {
 resource "null_resource" "role" {
   count      = local.attachment_required ? length(var.stages) : 0
   depends_on = ["aws_organizations_account.default"]
-  triggers   = {
+  triggers = {
     role = format("arn:aws:iam::%s:role/%s", element(aws_organizations_account.default.*.id, count.index), var.organization_access_role_name)
   }
 }
@@ -71,10 +71,20 @@ resource "aws_iam_policy" "assume_organization_role" {
   path        = "/"
 }
 
+resource "aws_iam_policy" "assume_organization_role_with_mfa" {
+  count       = local.attach_to_humans ? 1 : 0
+  name        = format("%s-assume-organization-role-with-mfa", var.namespace)
+  description = format("Allows to assume the %s in member accounts of the Organization if MFA is enabled", var.organization_access_role_name)
+  policy      = element(data.aws_iam_policy_document.assume_with_mfa.*.json, 0)
+  path        = "/"
+}
+
 resource "aws_iam_policy_attachment" "services" {
-  count      = local.attachment_required && !var.only_with_mfa ? 1 : 0
+  count      = local.attachment_required && ! var.only_with_mfa ? 1 : 0
   name       = format("%s-assume-organization-role", var.namespace)
   roles      = var.allow_assume_for_roles
+  users      = var.disable_mfa ? var.allow_assume_for_users : []
+  groups     = var.disable_mfa ? var.allow_assume_for_groups : []
   policy_arn = element(aws_iam_policy.assume_organization_role.*.arn, 0)
 }
 
@@ -84,5 +94,5 @@ resource "aws_iam_policy_attachment" "humans" {
   roles      = var.only_with_mfa ? var.allow_assume_for_roles : []
   users      = var.allow_assume_for_users
   groups     = var.allow_assume_for_groups
-  policy_arn = element(aws_iam_policy.assume_organization_role.*.arn, 0)
+  policy_arn = element(aws_iam_policy.assume_organization_role_with_mfa.*.arn, 0)
 }
