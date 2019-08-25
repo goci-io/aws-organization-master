@@ -29,11 +29,10 @@ resource "aws_organizations_account" "default" {
 }
 
 resource "null_resource" "role" {
-  count      = length(var.stages)
+  count      = local.attachment_required ? length(var.stages) : 0
   depends_on = ["aws_organizations_account.default"]
   triggers   = {
     role = format("arn:aws:iam::%s:role/%s", element(aws_organizations_account.default.*.id, count.index), var.organization_access_role_name)
-    name = lookup(var.stages[count.index], "name")
   }
 }
 
@@ -43,7 +42,6 @@ data "aws_iam_policy_document" "assume" {
   statement {
     effect    = "Allow"
     actions   = ["sts:AssumeRole"]
-    sid       = null_resource.role.*.triggers.name
     resources = null_resource.role.*.triggers.role
   }
 }
