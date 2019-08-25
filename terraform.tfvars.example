@@ -1,0 +1,11 @@
+stages = [
+  {
+    name           = "staging"
+    email          = "admin@staging.goci.io"
+    billing_access = false
+  },
+]
+
+allow_assume_for_roles = [
+  "name-of-role-which-is-allowed-to-assume"
+]
