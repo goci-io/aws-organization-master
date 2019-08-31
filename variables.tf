@@ -48,9 +48,3 @@ variable "disable_mfa" {
   default     = false
   description = "Disables MFA for users, groups. Cannot be used in combination with only_with_mfa"
 }
-
-variable "force_destroy" {
-  type        = bool
-  default     = false
-  description = "Once AWS organization accounts are prepared for deletion you can force destroy the organization or memeber accounts"
-}

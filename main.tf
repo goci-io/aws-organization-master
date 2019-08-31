@@ -15,7 +15,7 @@ resource "aws_organizations_organization" "default" {
   feature_set = "ALL"
 
   lifecycle {
-    prevent_destroy = !var.force_destroy
+    prevent_destroy = true
   }
 }
 
@@ -32,7 +32,7 @@ resource "aws_organizations_account" "default" {
   }
 
   lifecycle {
-    prevent_destroy = !var.force_destroy
+    prevent_destroy = true
   }
 }
 
