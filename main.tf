@@ -13,6 +13,10 @@ locals {
 
 resource "aws_organizations_organization" "default" {
   feature_set = "ALL"
+
+  lifecycle {
+    prevent_destroy = !var.force_destroy
+  }
 }
 
 resource "aws_organizations_account" "default" {
@@ -25,6 +29,10 @@ resource "aws_organizations_account" "default" {
   tags = {
     Namespace = var.namespace
     Stage     = lookup(var.stages[count.index], "name")
+  }
+
+  lifecycle {
+    prevent_destroy = !var.force_destroy
   }
 }
 
