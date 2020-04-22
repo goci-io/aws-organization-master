@@ -20,7 +20,7 @@ resource "aws_organizations_organization" "default" {
 }
 
 resource "aws_organizations_account" "default" {
-  depends_on                 = ["aws_organizations_organization.default"]
+  depends_on                 = [aws_organizations_organization.default]
   count                      = length(var.stages)
   name                       = lookup(var.stages[count.index], "name")
   email                      = lookup(var.stages[count.index], "email")
@@ -38,7 +38,7 @@ resource "aws_organizations_account" "default" {
 
 resource "null_resource" "role" {
   count      = local.attachment_required ? length(var.stages) : 0
-  depends_on = ["aws_organizations_account.default"]
+  depends_on = [aws_organizations_account.default]
   triggers = {
     role = format("arn:aws:iam::%s:role/%s", element(aws_organizations_account.default.*.id, count.index), var.organization_access_role_name)
   }
