@@ -1,8 +1,8 @@
 terraform {
   required_version = ">= 0.12.1"
-  
+
   required_providers {
-    null = "~> 2.1"  
+    null = "~> 2.1"
   }
 }
 
@@ -12,7 +12,7 @@ provider "aws" {
 
 locals {
   attachment_required = length(var.allow_assume_for_users) > 0 || length(var.allow_assume_for_roles) > 0 || length(var.allow_assume_for_groups) > 0
-  attach_to_humans    = (length(var.allow_assume_for_users) > 0 || length(var.allow_assume_for_groups) > 0 || var.only_with_mfa) && !var.disable_mfa
+  attach_to_humans    = (length(var.allow_assume_for_users) > 0 || length(var.allow_assume_for_groups) > 0 || var.only_with_mfa) && ! var.disable_mfa
 }
 
 resource "aws_organizations_organization" "default" {
@@ -49,7 +49,7 @@ resource "null_resource" "role" {
 }
 
 data "aws_iam_policy_document" "assume" {
-  count = local.attachment_required && !var.only_with_mfa ? 1 : 0
+  count = local.attachment_required && ! var.only_with_mfa ? 1 : 0
 
   statement {
     effect    = "Allow"
