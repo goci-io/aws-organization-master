@@ -2,7 +2,7 @@
 
 **Maintained by [@goci-io/prp-terraform](https://github.com/orgs/goci-io/teams/prp-terraform)**
 
-![Terraform Validate](https://github.com/goci-io/aws-organization-master/workflows/Terraform%20Validate/badge.svg)
+![terraform](https://github.com/goci-io/aws-organization-master/workflows/terraform/badge.svg?branch=master)
 
 This module provisions an AWS Organization and corresponding member accounts. [Read more](https://aws.amazon.com/organizations/) about AWS Organizations in general. 
 Additionally this module allows you to pass in role, user or group names to grant access to assume the organization role created in the member accounts. 
